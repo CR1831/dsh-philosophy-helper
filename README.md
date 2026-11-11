@@ -144,4 +144,6 @@ eval/
 
 MIT。详见 `LICENSE`。
 
-`assets/background.jpg` 是示例图，可自由替换为你自己的。
+`assets/background.jpg` 是一张 1600×1000 的纯色占位图（暖浅灰，约 11 KB），不含任何第三方素材。要换背景，直接在面板「资料」页选图即可，不用改这个文件。
+
+想替换默认图，把同尺寸的 JPG 覆盖到 `assets/background.jpg` 后重新构建。
