@@ -1,0 +1,8 @@
+# dsh-philosophy bundle layer: inserts the host plugin (tools + prompt section + case store)
+# and its web panel. The plugin reads cases from `stateDir`, which defaults to
+# ~/.dsh/storages/philosophy-agent when the profile leaves it out.
+- insert:
+    - id: dsh-philosophy
+      name: dsh-philosophy
+      config:
+        enabled: true

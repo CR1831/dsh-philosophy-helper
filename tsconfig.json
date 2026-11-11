@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "types": ["node"],
+    // pnpm 的 peer 解析会装出第二个 cordis 实例，`declare module` 的 augment 就落在另一个
+    // 模块实例上，Context 上的 webServer / systemPrompt / locale / slots 全部消失。
+    // 强制所有包引用根目录这一份，augment 才能合并。TS 6 起 paths 不需要 baseUrl。
+    "paths": {
+      "@deepseek-ai/cordis": ["./node_modules/@deepseek-ai/cordis"],
+      "@deepseek-ai/cordis/*": ["./node_modules/@deepseek-ai/cordis/*"]
+    }
+  },
+  "include": ["src", "tsdown.config.ts", "src/client/css.d.ts"]
+}
