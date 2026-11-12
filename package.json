@@ -1,6 +1,6 @@
 {
   "name": "dsh-philosophy-helper",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "哲学助手：概念澄清、论证分析、立场映射、多视角审议。中西哲双轨，带侧边栏面板、互动思维导图与多子 Agent 编排。",
