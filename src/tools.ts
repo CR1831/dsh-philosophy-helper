@@ -4,7 +4,7 @@ import type {} from '@deepseek-ai/dsh-tools'
 import { z } from 'zod'
 import type { CaseStore } from './store.ts'
 import type { ConceptStore } from './concepts.ts'
-import { CONTROVERSY, ENGINES, ENGINE_ORDER, MODES, type Case, type Controversy, type Engine, type Mode } from './types.ts'
+import { CONTROVERSY, ENGINES, ENGINE_ORDER, MODES, type ArgGraph, type Case, type ConceptTree, type Controversy, type Engine, type Mode, type StanceMap } from './types.ts'
 import { loadPersonas } from './personas.ts'
 
 const ModeSchema = z.enum(['advisor', 'coach', 'review', 'debate'])
@@ -137,6 +137,45 @@ export function registerTools(ctx: Context, store: CaseStore, concepts: ConceptS
         kind: z.enum(['supports', 'attacks']).describe('support=支撑，attack=反驳。'),
         reason: z.string().optional().describe('一句话理由，显示在地图边上。'),
       })).optional().describe('这个结论与其它引擎的关系。只写真实存在的支撑或反驳，不确定就留空。'),
+      graph: z.object({
+        premises: z.array(z.object({
+          id: z.string().min(1).describe('前提编号，如 p1。'),
+          text: z.string().min(1).describe('前提内容，一句话。'),
+          implicit: z.boolean().optional().describe('这是没说出口的隐含前提时设 true。'),
+        })).describe('前提列表。'),
+        conclusion: z.object({
+          id: z.string().min(1).describe('结论编号，如 c。'),
+          text: z.string().min(1).describe('结论内容。'),
+        }).describe('结论。'),
+        attacks: z.array(z.object({
+          from: z.string().min(1).describe('攻击方节点 id。'),
+          to: z.string().min(1).describe('被攻击节点 id。'),
+          reason: z.string().optional().describe('一句话理由。'),
+        })).optional().describe('反驳关系。'),
+      }).optional().describe('论证结构图。仅 argument 引擎用，写了面板才会画图。'),
+      conceptTree: z.object({
+        term: z.string().min(1).describe('被拆开的那个词。'),
+        readings: z.array(z.object({
+          name: z.string().min(1).describe('义项名，如「统计变量」。'),
+          criterion: z.string().describe('判准：怎么和相邻义项分开。'),
+          appliesWhen: z.string().optional().describe('什么时候这条读法成立。'),
+          failsWhen: z.string().optional().describe('什么时候失效。'),
+        })).min(2).describe('至少两条分叉。'),
+      }).optional().describe('概念分叉树。仅 concept 引擎用。'),
+      stanceMap: z.object({
+        xAxis: z.object({ label: z.string(), low: z.string(), high: z.string() }).describe('横轴：轴名 + 两端的意思。'),
+        yAxis: z.object({ label: z.string(), low: z.string(), high: z.string() }).describe('纵轴：轴名 + 两端的意思。'),
+        positions: z.array(z.object({
+          name: z.string().min(1).describe('哲学家名或立场名。'),
+          x: z.number().min(0).max(100).describe('0–100，从左到右。'),
+          y: z.number().min(0).max(100).describe('0–100，从下到上。'),
+          reason: z.string().optional().describe('为什么放在这个位置。'),
+        })).min(1).describe('点。'),
+        empty: z.array(z.object({
+          quadrant: z.string().describe('哪个象限，如「右上」。'),
+          note: z.string().describe('这里没人，为什么值得说。'),
+        })).optional().describe('没有人的区域。'),
+      }).optional().describe('立场坐标图。仅 stance 引擎用。'),
       sources: z.array(z.string()).optional().describe('依据标签，如 ["逻辑","文本"]。'),
       controversy: ControversySchema.optional().describe('争议度。'),
     }).strict()),
@@ -145,9 +184,21 @@ export function registerTools(ctx: Context, store: CaseStore, concepts: ConceptS
       const a = args as {
         id: string; engine: Engine; body: string
         links?: Array<{ to: Engine; kind: 'supports' | 'attacks'; reason?: string }>
+        graph?: ArgGraph
+        conceptTree?: ConceptTree
+        stanceMap?: StanceMap
         sources?: string[]; controversy?: Controversy
       }
-      const updated = await store.addFinding(a.id, { engine: a.engine, body: a.body, links: a.links, sources: a.sources, controversy: a.controversy })
+      const updated = await store.addFinding(a.id, {
+        engine: a.engine,
+        body: a.body,
+        links: a.links,
+        graph: a.graph,
+        conceptTree: a.conceptTree,
+        stanceMap: a.stanceMap,
+        sources: a.sources,
+        controversy: a.controversy,
+      })
       if (!updated) return { error: `找不到案件 ${a.id}` }
       // 不要留 undefined：工具返回值必须能无损 JSON 往返。
       return {

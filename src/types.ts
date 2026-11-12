@@ -110,10 +110,73 @@ export interface ClaimLink {
   reason?: string
 }
 
+/** 论证图的一个节点：前提或结论。 */
+export interface ArgNode {
+  id: string
+  text: string
+  /** 隐含前提，画成虚线框。 */
+  implicit?: boolean
+}
+
+/** 论证结构图的数据。由论证引擎在写回时一并给出。 */
+export interface ArgGraph {
+  premises: ArgNode[]
+  conclusion: ArgNode
+  /** 支撑关系：[从, 到]。省略时默认所有前提都指向结论。 */
+  supports?: Array<[string, string]>
+  /** 反驳关系。 */
+  attacks?: Array<{ from: string; to: string; kind?: string; reason?: string }>
+}
+
+/** 概念分叉树的一个义项。 */
+export interface ConceptReadingNode {
+  /** 义项名，如「统计变量」。 */
+  name: string
+  /** 判准：怎么把它和相邻义项分开。 */
+  criterion: string
+  /** 什么时候这条读法成立。 */
+  appliesWhen?: string
+  /** 什么时候失效。 */
+  failsWhen?: string
+}
+
+/** 概念分叉树：一个词劈成几条路。 */
+export interface ConceptTree {
+  term: string
+  readings: ConceptReadingNode[]
+}
+
+/** 立场坐标图上的一个点。 */
+export interface StancePosition {
+  /** 哲学家名或立场名。 */
+  name: string
+  /** 0–100，从左到右。 */
+  x: number
+  /** 0–100，从下到上。 */
+  y: number
+  /** 为什么放在这个位置，一句话。 */
+  reason?: string
+}
+
+/** 立场坐标图：两根轴 + 一堆点。 */
+export interface StanceMap {
+  xAxis: { label: string; low: string; high: string }
+  yAxis: { label: string; low: string; high: string }
+  positions: StancePosition[]
+  /** 没有人的象限，往往比有人的更有话说。 */
+  empty?: Array<{ quadrant: string; note: string }>
+}
+
 export interface Finding {
   engine: Engine
   /** 引擎输出正文，Markdown。 */
   body: string
+  /** 论证结构图（仅 argument 引擎用）。 */
+  graph?: ArgGraph
+  /** 概念分叉树（仅 concept 引擎用）。 */
+  conceptTree?: ConceptTree
+  /** 立场坐标图（仅 stance 引擎用）。 */
+  stanceMap?: StanceMap
   /** 依赖关系：这个引擎的结论支撑或反驳了哪些引擎。 */
   links?: ClaimLink[]
   /** 依据标签，例如 ['逻辑','文本']。 */

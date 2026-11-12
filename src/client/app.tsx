@@ -2,6 +2,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MODE_ENGINES, TEMPLATES, type Case, type CaseTemplate, type Engine, type Mode, type Persona } from '../types.ts'
 import { reviewCitations } from '../citations.ts'
+import { ArgMap } from './argmap.tsx'
+import { ConceptTreeView } from './concepttree.tsx'
+import { StanceMapView } from './stancemap.tsx'
 import type { T } from './locales.ts'
 import { Markdown } from './markdown.tsx'
 import styles from './styles.css?raw'
@@ -367,6 +370,13 @@ function CaseDetail({ t, catalog, record, onOpen, onFinish, onRemove }: {
   const [runNote, setRunNote] = useState('')
   const [runError, setRunError] = useState('')
   const [mapOpen, setMapOpen] = useState(false)
+  const [argOpen, setArgOpen] = useState(false)
+  const [treeOpen, setTreeOpen] = useState(false)
+  const [stanceOpen, setStanceOpen] = useState(false)
+
+  const argFinding = record.findings.find(f => f.engine === 'argument' && f.graph)
+  const treeFinding = record.findings.find(f => f.conceptTree)
+  const stanceFinding = record.findings.find(f => f.stanceMap)
   const [openFindings, setOpenFindings] = useState<Set<Engine>>(new Set())
 
   const toggleFinding = (engine: Engine) => setOpenFindings(prev => {
@@ -625,6 +635,15 @@ function CaseDetail({ t, catalog, record, onOpen, onFinish, onRemove }: {
       {/* 查看与导出 */}
       {record.findings.length > 0 && (
         <div className="ph-actions ph-actions--tools">
+          {treeFinding?.conceptTree && (
+            <button type="button" className="ph-btn" onClick={() => setTreeOpen(true)}>{t('conceptTree')}</button>
+          )}
+          {stanceFinding?.stanceMap && (
+            <button type="button" className="ph-btn" onClick={() => setStanceOpen(true)}>{t('stanceMap')}</button>
+          )}
+          {argFinding?.graph && (
+            <button type="button" className="ph-btn" onClick={() => setArgOpen(true)}>{t('argmap')}</button>
+          )}
           <button type="button" className="ph-btn" onClick={() => setMapOpen(true)}>{t('mindmap')}</button>
           <a className="ph-btn" download href={`/philosophy-api/export/${encodeURIComponent(record.id)}.md`}>
             {t('exportMd')}
@@ -645,6 +664,33 @@ function CaseDetail({ t, catalog, record, onOpen, onFinish, onRemove }: {
           <button type="button" className="ph-btn ph-btn--danger" onClick={() => onRemove(record.id)}>{t('remove')}</button>
         </div>
       </details>
+
+      {treeOpen && treeFinding?.conceptTree && (
+        <div className="ph-modal" onClick={() => setTreeOpen(false)}>
+          <div className="ph-modal-body ph-modal-body--wide" onClick={e => e.stopPropagation()}>
+            <button type="button" className="ph-modal-close" onClick={() => setTreeOpen(false)} title="关闭">×</button>
+            <ConceptTreeView tree={treeFinding.conceptTree} />
+          </div>
+        </div>
+      )}
+
+      {stanceOpen && stanceFinding?.stanceMap && (
+        <div className="ph-modal" onClick={() => setStanceOpen(false)}>
+          <div className="ph-modal-body ph-modal-body--wide" onClick={e => e.stopPropagation()}>
+            <button type="button" className="ph-modal-close" onClick={() => setStanceOpen(false)} title="关闭">×</button>
+            <StanceMapView map={stanceFinding.stanceMap} />
+          </div>
+        </div>
+      )}
+
+      {argOpen && argFinding?.graph && (
+        <div className="ph-modal" onClick={() => setArgOpen(false)}>
+          <div className="ph-modal-body ph-modal-body--argmap" onClick={e => e.stopPropagation()}>
+            <button type="button" className="ph-modal-close" onClick={() => setArgOpen(false)} title="关闭">×</button>
+            <ArgMap graph={argFinding.graph} />
+          </div>
+        </div>
+      )}
 
       {mapOpen && (
         <div className="ph-modal" onClick={() => setMapOpen(false)}>

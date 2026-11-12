@@ -1,7 +1,34 @@
 /** 轻量 Markdown 渲染：只处理哲学引擎实际会产出的那几种块，不引依赖。 */
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
+import { TERM_MAP, TERM_RE, type Term } from '../terms.ts'
 
 const INLINE_RE = /(\*\*[^*\n]+\*\*|`[^`\n]+`)/g
+
+/** 纯文本段里把术语包成可点的 span；代码块不走这一层。 */
+function withTerms(text: string, key: string): ReactNode[] {
+  if (!text) return []
+  const nodes: ReactNode[] = []
+  let last = 0
+  const re = new RegExp(TERM_RE.source, 'g')
+  let m: RegExpExecArray | null
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) nodes.push(text.slice(last, m.index))
+    nodes.push(
+      <span
+        key={`${key}-t${m.index}`}
+        className="ph-term"
+        data-term={m[0]}
+        role="button"
+        tabIndex={0}
+      >
+        {m[0]}
+      </span>,
+    )
+    last = m.index + m[0].length
+  }
+  if (last < text.length) nodes.push(text.slice(last))
+  return nodes
+}
 
 function inline(text: string, key: string): ReactNode[] {
   const nodes: ReactNode[] = []
@@ -9,16 +36,16 @@ function inline(text: string, key: string): ReactNode[] {
   let match: RegExpExecArray | null
   const re = new RegExp(INLINE_RE.source, 'g')
   while ((match = re.exec(text)) !== null) {
-    if (match.index > last) nodes.push(text.slice(last, match.index))
+    if (match.index > last) nodes.push(...withTerms(text.slice(last, match.index), key))
     const token = match[0]
     if (token.startsWith('**')) {
-      nodes.push(<strong key={`${key}-b${match.index}`}>{token.slice(2, -2)}</strong>)
+      nodes.push(<strong key={`${key}-b${match.index}`}>{withTerms(token.slice(2, -2), `${key}b`)}</strong>)
     } else {
       nodes.push(<code key={`${key}-c${match.index}`} className="ph-inline-code">{token.slice(1, -1)}</code>)
     }
     last = match.index + token.length
   }
-  if (last < text.length) nodes.push(text.slice(last))
+  if (last < text.length) nodes.push(...withTerms(text.slice(last), key))
   return nodes
 }
 
@@ -59,12 +86,19 @@ function renderTable(rows: string[], key: string): ReactNode {
   )
 }
 
+interface TipState {
+  term: Term
+  left: number
+  top: number
+}
+
 /**
  * 把引擎产出的 Markdown 渲染成块。
  * 支持：`#` 标题、`-`/`1.` 列表、`| |` 表格、`**粗体**`、`` `代码` ``。
- * 不认识的行原样保留，绝不吞内容。
+ * 术语表里有的词会变成可点的下划线，点开弹卡片。
  */
 export function Markdown({ text }: { text: string }) {
+  const [tip, setTip] = useState<TipState | null>(null)
   if (!text) return null
   const lines = text.split(/\r?\n/)
   const blocks: ReactNode[] = []
@@ -160,5 +194,40 @@ export function Markdown({ text }: { text: string }) {
     }
   }
 
-  return <>{blocks}</>
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const el = (event.target as HTMLElement).closest('.ph-term') as HTMLElement | null
+    if (!el) { setTip(null); return }
+    const term = TERM_MAP.get(el.dataset.term ?? '')
+    if (!term) return
+    const rect = el.getBoundingClientRect()
+    // 弹层固定定位，不会被滚动容器裁掉
+    const width = 300
+    const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))
+    const top = rect.bottom + 8 > window.innerHeight - 140 ? rect.top - 8 : rect.bottom + 8
+    setTip({ term, left, top })
+  }
+
+  return (
+    <div className="ph-md" onClick={handleClick}>
+      {blocks}
+      {tip && (
+        <>
+          <div className="ph-term-scrim" onClick={() => setTip(null)} />
+          <div
+            className="ph-term-tip"
+            style={{ left: tip.left, top: tip.top, width: 300 }}
+            data-above={tip.top < 0 ? 'true' : undefined}
+          >
+            <div className="ph-term-head">
+              <strong>{tip.term.zh}</strong>
+              {tip.term.en && <span>{tip.term.en}</span>}
+            </div>
+            <div className="ph-term-def">{tip.term.def}</div>
+            {tip.term.note && <div className="ph-term-note">{tip.term.note}</div>}
+            <button type="button" className="ph-term-close" onClick={() => setTip(null)}>知道了</button>
+          </div>
+        </>
+      )}
+    </div>
+  )
 }

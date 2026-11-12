@@ -9,6 +9,7 @@ const WORKBENCH = `## 哲学工作台
 
 - \`philosophy_case_open\` 开案件：一个案件 = 一次完整的哲学审议。动手前先开，别把长分析只留在对话里。
 - \`philosophy_case_save\` 写回：每个引擎的产出单独存一次，面板按引擎分栏显示。顺手用 \`links\` 标出它支撑或反驳了哪个引擎（support / attack），地图会画成有向边——**只写真实存在的关系，不确定就留空**。
+- 结构化字段能让面板出图，不填就只有文字：**概念引擎**给 \`conceptTree\`（词 + 至少两条义项，各带判准），**立场引擎**给 \`stanceMap\`（两根由问题决定的轴 + 各立场坐标 0–100，**空象限也要写**），**论证引擎**给 \`graph\`（前提 / 结论 / 隐含前提 / 反驳）。
 - \`philosophy_case_list\` / \`philosophy_case_read\` 接着上次的讨论。
 - \`philosophy_engine_contract\` 忘了某引擎该写哪几段时查它。
 - \`philosophy_personas\` 取人格方阵，用于多子 Agent 编排。

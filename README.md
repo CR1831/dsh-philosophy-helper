@@ -38,6 +38,15 @@
 
 **互动思维导图**：结构主义图版风格，三列对照（西哲 / 分析 / 中哲），正交折线，支持搜索、过滤、悬停预览。单文件 HTML，离线可开。
 
+**四张结构化图**，引擎写回结构化字段时才出现：
+
+| 图 | 谁用 | 画什么 |
+|---|---|---|
+| 术语卡 | 爱好者 | 正文里 76 个术语点开看定义 |
+| 论证结构图 | 学生 | 前提 / 结论 / 隐含前提（虚线框）/ 反驳（红虚线） |
+| 概念分叉树 | 爱好者 | 一个词劈成几条路，每条带判准、成立与失效条件 |
+| 立场坐标图 | 两者 | 两根由问题决定的轴，把立场摆成点；**空象限也标出来** |
+
 **导出**：Markdown 与单文件 HTML，正文渲染成真正的标题、列表、表格，而不是把源码塞进 `<pre>`。
 
 **概念库**：跨案件复用概念拆解，同一个词自动合并义项。
@@ -101,9 +110,10 @@ pnpm build       # 构建 host（ESM）与 client（CJS）
 ```
 src/
   index.ts       插件入口，注册工具 / 提示 / 路由
-  types.ts       引擎、模式、人格、模板的类型与常量
+  types.ts       引擎、模式、人格、模板、四种图的数据类型
   store.ts       案件存储（JSON，原子写）
   concepts.ts    概念库
+  terms.ts       术语表（76 条，给悬浮卡用）
   tools.ts       agent 工具注册
   prompt.ts      系统提示（工作台 / 声音 / 中西双轨 / 边界）
   runner.ts      专用会话的创建与消息注入
@@ -113,12 +123,19 @@ src/
   citations.ts   引文核对
   personas.ts    人格表加载
   client/        侧边栏面板（React）
+    app.tsx        三个页签与案件详情
+    markdown.tsx   Markdown 渲染 + 术语卡
+    argmap.tsx     论证结构图
+    concepttree.tsx 概念分叉树
+    stancemap.tsx  立场坐标图
+    styles.css / locales.ts
 assets/
   personas.json  64 位哲学家
-  background.jpg 示例背景（可替换）
+  background.jpg 纯色占位图（可替换）
 docs/
-  design-notes.md 设计取舍
-  roadmap.md      后续路线
+  design-notes.md      设计取舍
+  roadmap.md           后续路线
+  visualization-plan.md 可视化方案（八种图，已实现四种）
 eval/
   philosophy_metric.py  DSPy GEPA 评分器
 ```
@@ -136,6 +153,8 @@ eval/
 ## 已知限制
 
 - 论点依赖图靠 `links` 字段，需要 agent 主动填；不填就只有「谁提到谁」
+- 四张结构化图靠 `graph` / `conceptTree` / `stanceMap` 字段，同样需要 agent 主动填；旧案件没有这些数据，要重跑对应引擎才出图
+- 术语卡只有 76 条，覆盖的是有公认定义的词；争议大的词留给引擎在具体语境里拆
 - 引文核对只比对本地约 110 本常见著作，超出范围的会标「未收录」
 - 概念库不会自动从历史案件回溯填充，需要调用工具写入
 - 思维导图超过约 20 个节点时，正交线会开始拥挤

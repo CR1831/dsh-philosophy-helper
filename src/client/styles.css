@@ -920,6 +920,314 @@
   color: var(--dsw-alias-state-warn-primary);
 }
 
+/* 概念分叉树 -------------------------------------------------------- */
+
+.ph-concept-tree { padding: 26px 22px 18px; }
+.ph-concept-svg { width: 100%; height: auto; display: block; }
+
+.ph-ct-trunk {
+  fill: none;
+  stroke: var(--dsw-alias-border-l2);
+  stroke-width: 1.2;
+}
+
+.ph-ct-root rect {
+  fill: var(--ph-accent);
+  stroke: none;
+}
+
+.ph-ct-root text {
+  fill: #fff;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.ph-ct-card rect {
+  fill: var(--dsw-alias-bg-layer-1);
+  stroke: var(--dsw-alias-border-l2);
+  stroke-width: 1;
+}
+
+.ph-ct-name {
+  font-size: 13px;
+  font-weight: 650;
+  fill: var(--dsw-alias-label-primary);
+}
+
+.ph-ct-body {
+  font-size: 11.5px;
+  fill: var(--dsw-alias-label-secondary);
+}
+
+.ph-ct-ok {
+  font-size: 11px;
+  fill: var(--dsw-alias-state-success-primary, #2f8f5b);
+}
+
+.ph-ct-bad {
+  font-size: 11px;
+  fill: var(--dsw-alias-state-error-primary);
+}
+
+.ph-concept-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  font-size: 11.5px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.ph-concept-legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+
+.ph-concept-legend .ct-root-dot { background: var(--ph-accent); }
+.ph-concept-legend .ct-card-dot { background: var(--dsw-alias-border-l2); }
+
+/* 立场坐标图 -------------------------------------------------------- */
+
+.ph-stance { padding: 20px 18px 18px; }
+.ph-stance-svg { width: 100%; height: auto; display: block; }
+
+.ph-sa-plot {
+  fill: var(--dsw-alias-bg-layer-1);
+  stroke: var(--dsw-alias-border-l1);
+  stroke-width: 1;
+}
+
+.ph-sa-axis {
+  stroke: var(--dsw-alias-border-l2);
+  stroke-width: 1.2;
+}
+
+.ph-sa-end {
+  font-size: 11px;
+  fill: var(--dsw-alias-label-tertiary);
+}
+
+.ph-sa-name {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--dsw-alias-label-secondary);
+}
+
+.ph-sa-empty rect {
+  fill: var(--dsw-alias-bg-layer-2);
+  stroke: var(--dsw-alias-border-l1);
+  stroke-dasharray: 3 3;
+}
+
+.ph-sa-empty text {
+  font-size: 10.5px;
+  fill: var(--dsw-alias-label-tertiary);
+}
+
+.ph-sa-point circle {
+  fill: var(--ph-accent);
+  stroke: var(--dsw-alias-bg-base);
+  stroke-width: 2;
+}
+
+.ph-sa-point text {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--dsw-alias-label-primary);
+}
+
+.ph-stance-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.ph-stance-legend b {
+  color: var(--ph-accent);
+  margin-right: 2px;
+}
+
+.ph-modal-body--wide {
+  width: min(1000px, 96vw);
+  height: auto;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+/* 论证结构图 -------------------------------------------------------- */
+
+.ph-argmap {
+  padding: 26px 22px 20px;
+}
+
+.ph-argmap-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ph-argmap-node rect {
+  fill: var(--dsw-alias-bg-layer-1);
+  stroke: var(--dsw-alias-border-l2);
+  stroke-width: 1;
+}
+
+.ph-argmap-node[data-implicit='true'] rect {
+  fill: var(--dsw-alias-bg-layer-2);
+  stroke-dasharray: 5 4;
+}
+
+.ph-argmap-tag {
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  fill: var(--dsw-alias-label-tertiary);
+}
+
+.ph-argmap-text {
+  font-size: 12.5px;
+  fill: var(--dsw-alias-label-primary);
+}
+
+.ph-argmap-edge {
+  fill: none;
+  stroke: var(--dsw-alias-border-l2);
+  stroke-width: 1.4;
+}
+
+.ph-argmap-attack {
+  fill: none;
+  stroke: var(--dsw-alias-state-error-primary);
+  stroke-width: 1.4;
+  stroke-dasharray: 6 4;
+}
+
+.ph-argmap-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-size: 11.5px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.ph-argmap-legend span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ph-argmap-legend i {
+  display: inline-block;
+  width: 18px;
+  margin-right: 6px;
+}
+
+.ph-argmap-legend .lg-solid {
+  border-top: 2px solid var(--dsw-alias-border-l2);
+}
+
+.ph-argmap-legend .lg-dash {
+  border-top: 2px dashed var(--dsw-alias-state-error-primary);
+}
+
+.ph-argmap-legend .lg-implicit {
+  width: 14px;
+  height: 9px;
+  border: 1px dashed var(--dsw-alias-border-l2);
+  border-radius: 2px;
+}
+
+.ph-modal-body--argmap {
+  width: min(920px, 95vw);
+  height: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* 术语悬浮卡 -------------------------------------------------------- */
+
+.ph-md { display: contents; }
+
+.ph-term {
+  border-bottom: 1px dashed color-mix(in srgb, var(--ph-accent) 55%, transparent);
+  cursor: pointer;
+}
+
+.ph-term:hover {
+  background: color-mix(in srgb, var(--ph-accent) 10%, transparent);
+}
+
+.ph-term-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+}
+
+.ph-term-tip {
+  position: fixed;
+  z-index: 9999;
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  font-size: 12.5px;
+  line-height: 1.75;
+  text-align: left;
+}
+
+.ph-term-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ph-term-head strong {
+  font-size: 13.5px;
+  color: var(--ph-accent);
+}
+
+.ph-term-head span {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.ph-term-def {
+  color: var(--dsw-alias-label-primary);
+}
+
+.ph-term-note {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid var(--dsw-alias-border-l1);
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.ph-term-close {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  color: var(--ph-accent);
+  cursor: pointer;
+}
+
+.ph-term-close:hover {
+  text-decoration: underline;
+}
+
 /* 背景设置 ---------------------------------------------------------- */
 
 .ph-bg-row {
